@@ -109,7 +109,7 @@ def main():
         # üres fájl létrehozása
         open(os.path.join(debug, 'mailbox'), 'w').close()
 
-    for entry in db_reader:
+    for entry in forras_reader:
         data = dict(zip(fejlec, entry))
         # Ha van 'plugEntry' függvény, azt végrehajtjuk
         if 'plugEntry' in locals():
