@@ -7,12 +7,12 @@ Sablon és adatbázis (csv) alapján kör-emailt küld.
 '''
 
 import os, sys
-import smtplib, email, yaml
+import smtplib, email, ConfigParser
 
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
-confFile = 'config.yaml'
+confFile = 'korlevel.ini'
 prog = sys.argv[0]
 
 def Exit(msg=None, exitcode=1):
@@ -63,7 +63,7 @@ def main():
     if '-h' in opts.keys() or '--help' in opts.keys():
         usage(exitcode=0)
 
-    # alapértelmezett az aktuális könyvtárat vesszük
+    # alapértelmezetten az aktuális könyvtárat vesszük
     BASE = '.'
     # ha van megadva könyvtár, akkor azt használjuk
     if len(argv) == 1:
@@ -74,14 +74,16 @@ def main():
         confGen()
         sys.exit(0)
 
+    if not os.path.isfile(confFile):
+        Exit('Nincs %s fájl!\nÍgy készíthetsz: %s -g' % (confFile, prog))
+
     debug = False
     if '-d' in opts.keys() or '--debug' in opts.keys():
         debug = True
 
-    try:
-        config = yaml.load(open(confFile))
-    except IOError:
-        Exit('Nincs %s fájl!\nÍgy készíthetsz: %s -g' % (confFile, prog))
+    parser = ConfigParser.ConfigParser()
+    parser.read(confFile)
+    config = dict(parser.items('korlevel'))
 
     try:
         sablon = open(config['sablon']).read()
@@ -122,7 +124,7 @@ def confGen():
         print 'már van %s' % confFile
         return 0
     else:
-        open(confFile, 'w').write('''
+        open(confFile, 'w').write('''[korlevel]
 #############################################################################
 # A küldendő levél szövege, benne a kitöltendő mezők jelölésével
 # %(mezo)s formában.
