@@ -7,7 +7,7 @@ Sablon és adatbázis (csv) alapján kör-emailt küld.
 '''
 
 import os, sys
-import smtplib, email, ConfigParser
+import csv, getopt, smtplib, email, ConfigParser
 
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
@@ -52,7 +52,6 @@ def send(debug, From, To, Subject, Content):
         s.quit()
 
 def main():
-    import getopt
     try:
         opts, argv = getopt.getopt(sys.argv[1:], "hdg", ['help', 'debug', 'gen'])
     except getopt.GetoptError, err:
@@ -91,7 +90,6 @@ def main():
         Exit('A megadott sablon fájl (%s) nem létezik.' % config['sablon'])
 
     try:
-        import csv
         forras_reader = csv.reader(open(config['forras'], "rb"), delimiter=';', quoting=csv.QUOTE_MINIMAL)
     except IOError:
         Exit('A megadott adat fájl (%s) nem létezik.' % config['forras'])
