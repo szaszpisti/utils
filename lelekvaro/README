@@ -1,0 +1,19 @@
+
+[gyökér]
+- gyökér HEAD.index szerkesztése
+- htgen
+- a linket megcsinálja a lelekvaro.py
+
+[20xx]
+- szokásosan elmenteni .hun-ban, átnevezni .txt-re (ezt használja a lelekvaro.py)
+- ../lelekvaro.py
+- átnézzük, hogy a címek rendben vannak-e (mind megvan?) ./lelekvaro.py; grep H3 *.hun | less
+- az aláírásokat kézzel kell átírni (^P_alairas:) - és egyéb formázásokat
+- H1, H2 aktualizálása (évszám, egyéb)
+	(itt van a stílus is, hogy a www.szepi.hu-ra ne kelljen barkácsolni)
+=> lelekvaro.py:
+	- 20xx_Lelekvaro.hun
+	- a HEAD elkészítése: H1 + tocTable + H2 + toc
+	- htgen
+	- link készítése a gyökérbe
+

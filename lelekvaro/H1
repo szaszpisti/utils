@@ -1,0 +1,46 @@
+<html>
+<head>
+  <title>Lélekváró elmélkedések - %(ev)s</title>
+  <meta name="Author" content="Szász Imre">
+  <meta name="Description" content="Lélekváró elmélkedések">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Language" content="hu">
+  <link rel="stylesheet" href="default.css" type="text/css">
+</head>
+<body>
+
+<p class="menu noprint">
+[ <a class="menu" href="../../../index.html" target="_top">SzePi</a>
+| <a class="menu" href="../../index.html">Irodalom</a>
+| <a class="menu" href="../index.html">Vallás</a>
+| <a class="menu" href="index.html">Lélekváró elmélkedések</a> ]
+</p>
+
+<style type="text/css">
+  p.alairas { text-align: right; }
+  #lead { font-size: 70%%; padding-top: 1em; text-align: right; }
+  div.napcim, #today { padding: .7em 0; border-top: 1pt solid; 
+    font-family: "Book Antiqua", Georgia, Palatino, Times, "Times New Roman", serif; }
+  div.h3nap { float: left; }
+  div.h3nap h3 { font-size: 14pt; margin-top: 0; }
+  div.h3ige { float: right; }
+  div.h3ige h3 { font-size: 12pt; margin-top: 0; }
+  #felso { margin-top: .7em; }
+  #tocTable { border-top: 1pt solid; border-bottom: 1pt solid; margin: 0 0 .7em 0; }
+  #tocTable td { white-space: nowrap; padding: 0 1px; font-size: 9pt; }
+  #tocTable td+td { text-align: right; font-size: 80%%; }
+  #toc { font-size: 80%%; padding-top: .7em; padding-bottom: .7em; margin-top: 1em; }
+  input { font-size: 80%%; }
+  input[type="button"] { padding: 0 6px; margin: 0 0 1em 0; }
+  @media print {
+    .noprint { visibility: hidden; display: none; }
+  }
+</style>
+
+<div id="felso" class="noprint">
+  <div style="float: right;">
+    <input id="gombMutat" type="button" value="Mindent mutat..." onClick="allShowHide('minden');">
+    <input type="button" value="Nyomtat" onClick="window.print();">
+  </div><!-- end of gomb -->
+  <div style="float: left;">
+    <table id="tocTable">

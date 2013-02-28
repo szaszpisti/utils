@@ -1,0 +1,53 @@
+
+</div><!-- end of minden -->
+
+<script language="JavaScript"><!--
+
+function zeroPad(s) {
+    return (s<10 ? '0'+s : s);
+}
+
+function mutat(nap) {
+    allHide();
+    obj = document.getElementById(nap);
+    document.getElementById('today').innerHTML = obj ? obj.innerHTML : '';
+}
+
+/* Mindent mutat" esetén HIDE: today, toc, SHOW: body */
+function allShow(id){
+    document.getElementById('minden').style.display = "";
+    document.getElementById('today').style.display = "none";
+    document.getElementById('gombMutat').value = 'Takar...';
+    document.getElementById('lead').className = '';  /* az összes nyomtatásakor van lead */
+}
+function allHide(){
+    document.getElementById('minden').style.display = "none";
+    document.getElementById('today').style.display = "";
+    document.getElementById('gombMutat').value = 'Mindent mutat...';
+    document.getElementById('lead').className = 'noprint';
+}
+
+function allShowHide(){
+    if (document.getElementById('minden').style.display == "none") {
+        allShow();
+    } else {
+        allHide()
+    }
+}
+
+window.onload = function() {
+    h = location.hash;
+    datum = h.substr(h.indexOf('0'));
+    if (datum.length != 4) {
+        d = new Date();
+        datum = zeroPad(d.getMonth()+1) + zeroPad(d.getDate());
+    }
+    mutat(datum);
+    allShowHide();
+}
+
+//--></script>
+
+<p><hr><img src="dugo.png" alt="dugo@szepi_PONT_hu" align="top">
+</body>
+</html>
