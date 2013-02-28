@@ -7,7 +7,8 @@ Sablon és adatbázis (csv) alapján kör-emailt küld.
 '''
 
 import os, sys
-import csv, getopt, smtplib, email, ConfigParser
+import csv, getopt, smtplib, ConfigParser
+import email.header, email.utils, email.mime.text
 
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
