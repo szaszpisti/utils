@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Az aktuális könyvtár minden pdf-jének első oldalából egy ugyanolyan nevű
+# png kiterjesztésű kicsi index-képet csinál
+# usage: index-kep file.pdf
+
+[ -z "$1" ] && PDF=$( /bin/ls *.pdf ) || PDF="$@"
+[ -z "$PDF" ] && { echo "Usage: ${0##*/} file.pdf"; exit 1; }
+
+echo $PDF
+for pdf in $PDF; do
+	png=${pdf%.pdf}.png
+	[ -f "$png" ] && continue
+	echo convert -scale "99x140" "$pdf[0]" "$png"
+	convert -scale "99x140" "$pdf[0]" "$png"
+done
+
