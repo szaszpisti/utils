@@ -100,7 +100,7 @@ def main():
 
     # Ha van extra módosítási igény, azt az "config['plugin']" fájlba tesszük
     if config.has_key('plugin'):
-        execfile(config['plugin'])
+        exec open(config['plugin']).read()
 
     # ha "debug" akkor a config['debug'], annak híján a "debug" könyvtárba írjuk a kimenetet.
     if debug:
