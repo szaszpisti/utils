@@ -4,6 +4,8 @@
 
 '''@file korlevel.py
 Sablon és adatbázis (csv) alapján kör-emailt küld.
+
+ln -s ~/git/utils/korlevel.py ~/bin/korlevel
 '''
 
 import os, sys
