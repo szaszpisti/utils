@@ -25,9 +25,9 @@ def Exit(msg=None, exitcode=1):
 def usage(msg=None, exitcode=1):
     if msg: print msg
     print 'Usage: %s [-d|--debug] [-h|--help] [-g|--gen] [dir]' % prog
-    print '   dir - a könyvtárban kell legyen config.yaml'
+    print '   dir - a könyvtárban kell legyen korlevel.ini'
     print '   -h|--help    ez a súgó'
-    print '   -g|--gen     az adott könyvtárba ír egy default config.yaml fájlt'
+    print '   -g|--gen     az adott könyvtárba ír egy default korlevel.ini fájlt'
     print '   -d|--debug   nem küld levelet, hanem a ("debug") könyvtárba írja fájlokba'
     sys.exit(exitcode)
 
