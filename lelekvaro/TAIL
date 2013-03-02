@@ -42,14 +42,12 @@ function allShowHide(){
 }
 
 window.onload = function() {
-    h = location.hash;
-    datum = h.substr(h.indexOf('0'));
-    if (datum.length != 4) {
+    datum = location.hash.substr(1);
+    if (datum.length != 10) {
         d = new Date();
-        datum = zeroPad(d.getMonth()+1) + zeroPad(d.getDate());
+        datum = d.getFullYear() + '-' + zeroPad(d.getMonth()+1) + '-' + zeroPad(d.getDate());
     }
     mutat(datum);
-    allShowHide();
 }
 
 //--></script>
