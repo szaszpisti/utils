@@ -8,9 +8,15 @@ function zeroPad(s) {
 }
 
 function mutat(nap) {
-    allHide();
+    /* Ha van ilyen nap, akkor csak azt mutatjuk, egyébként mindent. */
     obj = document.getElementById(nap);
-    document.getElementById('today').innerHTML = obj ? obj.innerHTML : '';
+    if(obj) {
+        document.getElementById('today').innerHTML = obj.innerHTML;
+        allHide();
+    } else {
+        document.getElementById('today').innerHTML = '';
+        allShow();
+    }
 }
 
 /* Mindent mutat" esetén HIDE: today, toc, SHOW: body */
