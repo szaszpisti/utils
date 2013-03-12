@@ -197,8 +197,8 @@ forras: adatok.csv
 # A küldött levél feladója és tárgya
 
 header:
-- From: Karácsonyi Mikulás <mikulas@lappfold.hu>
-- Subject: Ajándék értesítő
+ From: Karácsonyi Mikulás <mikulas@lappfold.hu>
+ Subject: Ajándék értesítő
 
 #############################################################################
 # Ha egyéb parancsot akarunk futtatni
