@@ -9,7 +9,7 @@ ln -s ~/git/utils/korlevel.py ~/bin/korlevel
 '''
 
 import os, sys
-import csv, getopt, smtplib, ConfigParser
+import csv, getopt, smtplib, yaml
 import email.header, email.utils, email.mime.text
 
 reload(sys)
@@ -104,9 +104,7 @@ def main():
     if '-d' in opts.keys() or '--debug' in opts.keys():
         debug = True
 
-    parser = ConfigParser.ConfigParser()
-    parser.read(confFile)
-    config = dict(parser.items('korlevel'))
+    config = yaml.load(open('korlevel.ini'))
 
     try:
         sablon = open(config['sablon']).read()
@@ -146,7 +144,7 @@ def confGen():
         print 'már van %s' % confFile
         return 0
     else:
-        open(confFile, 'w').write('''[korlevel]
+        open(confFile, 'w').write('''# YAML
 #############################################################################
 # A küldendő levél szövege, benne a kitöltendő mezők jelölésével
 # %(mezo)s formában.
