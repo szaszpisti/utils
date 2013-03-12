@@ -46,48 +46,72 @@ def usage(msg=None, exitcode=1):
     print '   -d|--debug   nem küld levelet, hanem a ("debug") könyvtárba írja fájlokba'
     sys.exit(exitcode)
 
-def send(debug, From, To, Subject, Content, pdf=None):
+def attach(filename):
+    '''Elkészíti a MIME részt, benne a fájlnévvel'''
+    if not os.path.isfile(filename):
+        return None
 
+    ctype, encoding = mimetypes.guess_type(filename)
+    if ctype is None or encoding is not None:
+        ctype = 'application/octet-stream'
+
+    maintype, subtype = ctype.split('/', 1)
+    attachContent = open(filename, 'rb').read()
+
+    if maintype == 'text':
+        msg = MIMEText(attachContent, _subtype=subtype)
+    elif maintype == 'image':
+        msg = MIMEImage(attachContent, _subtype=subtype)
+    elif maintype == 'audio':
+        msg = MIMEAudio(attachContent, _subtype=subtype)
+    else:
+        msg = MIMEBase(maintype, subtype)
+        msg.set_payload(attachContent)
+        encoders.encode_base64(msg)
+
+    msg.add_header('Content-Disposition', 'attachment', filename=filename)
+    return msg
+
+def intlAddress(address):
     # RFC 2822 fejléc-mező ("Subject: =?iso-8859-1?q?p=F6stal?=")
     u = lambda text: email.header.Header(text.decode('utf-8')).encode()
 
     # Az utf-8 email cimből levélben küldhető mezőt állítunk elő
-    emil = email.utils.parseaddr(From)
-    From = '%s <%s>' % (u(emil[0]), emil[1])
-    emil = email.utils.parseaddr(To)
-    To = '%s <%s>' % (u(emil[0]), emil[1])
-    debugFile = emil[1]
+    emil = email.utils.parseaddr(address)
 
+    return '%s <%s>' % (u(emil[0]), emil[1])
 
-    if pdf:
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.application import MIMEApplication
-        msg = MIMEMultipart()
-        msg['From'], msg['To'], msg['Subject'] = From, To, Subject
+def send(debug, header, To, Content, filenames=None):
+
+    header['From'] = intlAddress(header['From'])
+    To = intlAddress(To)
+
+    if filenames:
+        msg = MIMEMultipart('alternative')
+        # a header mezőit átmásoljuk az üzenetbe
+        for field in header:
+            msg[field] = header[field]
+        msg['To'] = To
 
         body = MIMEText(Content, 'plain', 'utf-8')
-#        body = MIMEText(Content)
         msg.attach(body)
 
-        pdfPart = MIMEApplication(open(pdf).read(), 'pdf')
-        pdfPart.add_header('Content-Disposition', 'attachment', filename=pdf)
-        msg.attach(pdfPart)
+        for filename in filenames:
+            msg.attach(attach(filename))
 
-#        print 'Sent to: %s (%d)' % (T['nev'], len(T['pdf']))
-
+    # Csatolás nélküli szimpla email
     else:
-        from email.mime.text import MIMEText
         msg = MIMEText(Content, 'plain', 'utf-8')
-        msg['From'], msg['To'], msg['Subject'] = From, To, Subject
+        msg['From'], msg['To'], msg['Subject'] = header['From'], header['To'], Subject
 
 
+    # Ha csak debug kell, akkor elmentjük a config['debug'] mailbox-ba
     if debug:
-        open(os.path.join(debug, debugFile), 'w').write(Content)
-        open(os.path.join(debug, 'mailbox'), 'a').write('From szaszi Mon Jan 01 00:00:00 2000\n' + msg.as_string() + '\n')
+        open('mailbox', 'a').write('From szaszi Mon Jan 01 00:00:00 2000\n' + msg.as_string() + '\n')
+    # egyébként elküldjük
     else:
         s = smtplib.SMTP('localhost')
-        s.sendmail(From, [To], msg.as_string())
+        s.sendmail(header['From'], [To], msg.as_string())
         s.quit()
 
 def main():
@@ -138,13 +162,10 @@ def main():
 
     # ha "debug" akkor a config['debug'], annak híján a "debug" könyvtárba írjuk a kimenetet.
     if debug:
-        debug = 'debug'
+        debug = 'mailbox'
         if config.has_key('debug'): debug = config['debug']
-        # ha nincs könyvtára, akkor létrehozzuk
-        if not os.path.isdir(debug):
-            os.mkdir(debug)
         # üres fájl létrehozása
-        open(os.path.join(debug, 'mailbox'), 'w').close()
+        open('mailbox', 'w').close()
 
     for entry in forras_reader:
         data = dict(zip(fejlec, entry))
@@ -152,7 +173,7 @@ def main():
         if 'plugEntry' in locals():
             plugEntry(data)
 
-        send(debug, config['from'], data['email'], config['subject'], sablon % data, config['pdf'])
+        send(debug, config['header'], data['email'], sablon % data, config['attach'])
 
 def confGen():
     if os.path.isfile(confFile):
@@ -175,28 +196,29 @@ forras: adatok.csv
 #############################################################################
 # A küldött levél feladója és tárgya
 
-from: Karácsonyi Mikulás <mikulas@lappfold.hu>
-subject: Ajándék értesítő
+header:
+- From: Karácsonyi Mikulás <mikulas@lappfold.hu>
+- Subject: Ajándék értesítő
 
 #############################################################################
 # Ha egyéb parancsot akarunk futtatni
 #
 # sub plugEntry(data): az adatsorok mindegyikén akarunk valamit módosítani
 
-# plugin: plugin.py
+#plugin: plugin.py
 
 #############################################################################
 # Ha van pdf, azt csatolja a levélhez
 
-# pdf: csatolmany.pdf
+#attach:
+#- csatolmany.pdf
+#- egy masik.zip
 
 #############################################################################
-# Ha teszteléshez küldés helyett fájlokat szeretnénk létrehozni
+# Ha teszteléshez küldés helyett egy mailbox fájlt szeretnénk létrehozni.
 # parancssorban: -d
-# Az adott könyvtárban minden email-címhez létrehoz egy fájlt
-# + egy mailbox foldert, amiben minden levél benne van.
 
-# debug: debug
+#debug: mailbox
 ''')
         print "%s létrehozva" % confFile
 
