@@ -31,7 +31,7 @@ def usage(msg=None, exitcode=1):
     print '   -d|--debug   nem küld levelet, hanem a ("debug") könyvtárba írja fájlokba'
     sys.exit(exitcode)
 
-def send(debug, From, To, Subject, Content):
+def send(debug, From, To, Subject, Content, pdf=None):
 
     # RFC 2822 fejléc-mező ("Subject: =?iso-8859-1?q?p=F6stal?=")
     u = lambda text: email.header.Header(text.decode('utf-8')).encode()
@@ -43,8 +43,29 @@ def send(debug, From, To, Subject, Content):
     To = '%s <%s>' % (u(emil[0]), emil[1])
     debugFile = emil[1]
 
-    msg = email.mime.text.MIMEText(Content, 'plain', 'utf-8')
-    msg['From'], msg['To'], msg['Subject'] = From, To, Subject
+
+    if pdf:
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.application import MIMEApplication
+        msg = MIMEMultipart()
+        msg['From'], msg['To'], msg['Subject'] = From, To, Subject
+
+        body = MIMEText(Content, 'plain', 'utf-8')
+#        body = MIMEText(Content)
+        msg.attach(body)
+
+        pdfPart = MIMEApplication(open(pdf).read(), 'pdf')
+        pdfPart.add_header('Content-Disposition', 'attachment', filename=pdf)
+        msg.attach(pdfPart)
+
+#        print 'Sent to: %s (%d)' % (T['nev'], len(T['pdf']))
+
+    else:
+        from email.mime.text import MIMEText
+        msg = MIMEText(Content, 'plain', 'utf-8')
+        msg['From'], msg['To'], msg['Subject'] = From, To, Subject
+
 
     if debug:
         open(os.path.join(debug, debugFile), 'w').write(Content)
@@ -118,7 +139,7 @@ def main():
         if 'plugEntry' in locals():
             plugEntry(data)
 
-        send(debug, config['from'], data['email'], config['subject'], sablon % data)
+        send(debug, config['from'], data['email'], config['subject'], sablon % data, config['pdf'])
 
 def confGen():
     if os.path.isfile(confFile):
@@ -150,6 +171,11 @@ subject: Ajándék értesítő
 # sub plugEntry(data): az adatsorok mindegyikén akarunk valamit módosítani
 
 # plugin: plugin.py
+
+#############################################################################
+# Ha van pdf, azt csatolja a levélhez
+
+# pdf: csatolmany.pdf
 
 #############################################################################
 # Ha teszteléshez küldés helyett fájlokat szeretnénk létrehozni
