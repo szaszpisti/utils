@@ -15,6 +15,9 @@ import email.header, email.utils, email.mime.text
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
+# specify quoted-printable instead of base64
+charset.CHARSETS['utf-8'] = ( charset.QP, charset.QP, 'utf-8' )
+
 confFile = 'korlevel.ini'
 prog = sys.argv[0]
 
