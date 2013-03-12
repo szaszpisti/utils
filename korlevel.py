@@ -12,6 +12,18 @@ import os, sys
 import csv, getopt, smtplib, yaml
 import email.header, email.utils, email.mime.text
 
+import smtplib
+
+import mimetypes
+from email import encoders
+from email.message import Message
+from email.mime.audio import MIMEAudio
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email import charset
+
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
