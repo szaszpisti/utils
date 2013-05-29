@@ -87,7 +87,7 @@ def send(debug, header, To, Content, filenames=None):
     To = intlAddress(To)
 
     if filenames:
-        msg = MIMEMultipart('alternative')
+        msg = MIMEMultipart()
         # a header mezőit átmásoljuk az üzenetbe
         for field in header:
             msg[field] = header[field]
