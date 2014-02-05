@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# coding: utf-8
+#!/usr/bin/python3
 # ~/bin/korlevel.py
 
 '''@file korlevel.py
@@ -24,9 +23,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email import charset
 
-reload(sys)
-sys.setdefaultencoding( "utf-8" )
-
 # specify quoted-printable instead of base64
 charset.CHARSETS['utf-8'] = ( charset.QP, charset.QP, 'utf-8' )
 
@@ -34,16 +30,15 @@ confFile = 'korlevel.ini'
 prog = sys.argv[0]
 
 def Exit(msg=None, exitcode=1):
-    if msg: print msg
+    if msg: print(msg)
     sys.exit(exitcode)
 
 def usage(msg=None, exitcode=1):
-    if msg: print msg
-    print 'Usage: %s [-d|--debug] [-h|--help] [-g|--gen] [dir]' % prog
-    print '   dir - a könyvtárban kell legyen korlevel.ini'
-    print '   -h|--help    ez a súgó'
-    print '   -g|--gen     az adott könyvtárba ír egy default korlevel.ini fájlt'
-    print '   -d|--debug   nem küld levelet, hanem a ("debug") könyvtárba írja fájlokba'
+    if msg: print(msg)
+    print('Usage: %s [-d|--debug file] [-h|--help] [-g|--gen]' % prog)
+    print('   -h|--help       ez a súgó')
+    print('   -g|--gen        az adott könyvtárba ír egy default korlevel.ini fájlt')
+    print('   -d|--debug file nem küld levelet, hanem a "file" mailboxba teszi a leveleket')
     sys.exit(exitcode)
 
 def attach(filename):
@@ -102,12 +97,14 @@ def send(debug, header, To, Content, filenames=None):
     # Csatolás nélküli szimpla email
     else:
         msg = MIMEText(Content, 'plain', 'utf-8')
-        msg['From'], msg['To'], msg['Subject'] = header['From'], header['To'], Subject
+        for field in header:
+            msg[field] = header[field]
+        msg['To'] = To
+#        msg['From'], msg['To'], msg['Subject'] = header['From'], To, Subject
 
-
-    # Ha csak debug kell, akkor elmentjük a config['debug'] mailbox-ba
+    # Ha csak debug kell, akkor elmentjük a "debug" fáltozóba
     if debug:
-        open('mailbox', 'a').write('From szaszi Mon Jan 01 00:00:00 2000\n' + msg.as_string() + '\n')
+        open(debug, 'a').write('From pistike Mon Jan 01 00:00:00 2000\n' + msg.as_string() + '\n')
     # egyébként elküldjük
     else:
         s = smtplib.SMTP('localhost')
@@ -116,32 +113,25 @@ def send(debug, header, To, Content, filenames=None):
 
 def main():
     try:
-        opts, argv = getopt.getopt(sys.argv[1:], "hdg", ['help', 'debug', 'gen'])
-    except getopt.GetoptError, err:
-        print str(err)
+        opts, args = getopt.getopt(sys.argv[1:], "hd:g", ['help', 'debug=', 'gen'])
+    except getopt.GetoptError as err:
+        print(str(err))
         usage()
-    opts = dict(opts)
 
-    if '-h' in opts.keys() or '--help' in opts.keys():
-        usage(exitcode=0)
-
-    # alapértelmezetten az aktuális könyvtárat vesszük
-    BASE = '.'
-    # ha van megadva könyvtár, akkor azt használjuk
-    if len(argv) == 1:
-        BASE = argv[0]
-    os.chdir(BASE)
-
-    if '-g' in opts.keys() or '--gen' in opts.keys():
-        confGen()
-        sys.exit(0)
+    debug = False
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            usage(exitcode=0)
+        elif opt in ('-g', '--gen'):
+            confGen()
+            sys.exit(0)
+        elif opt in ('-d', '--debug'):
+            debug = arg
+            # üres fájl létrehozása
+            open(debug, 'w').close()
 
     if not os.path.isfile(confFile):
         Exit('Nincs %s fájl!\nÍgy készíthetsz: %s -g' % (confFile, prog))
-
-    debug = False
-    if '-d' in opts.keys() or '--debug' in opts.keys():
-        debug = True
 
     config = yaml.load(open('korlevel.ini'))
 
@@ -151,25 +141,24 @@ def main():
         Exit('A megadott sablon fájl (%s) nem létezik.' % config['sablon'])
 
     try:
-        forras_reader = csv.reader(open(config['forras'], "rb"), delimiter=';', quoting=csv.QUOTE_MINIMAL)
+        forras_reader = csv.reader(open(config['forras']), delimiter=';', quoting=csv.QUOTE_MINIMAL)
     except IOError:
         Exit('A megadott adat fájl (%s) nem létezik.' % config['forras'])
-    fejlec = forras_reader.next()
+    fejlec = next(forras_reader)
 
     # Ha van extra módosítási igény, azt az "config['plugin']" fájlba tesszük
-    if config.has_key('plugin'):
-        exec open(config['plugin']).read()
+    if 'plugin' in config:
+        exec(open(config['plugin']).read())
 
-    # ha "debug" akkor a config['debug'], annak híján a "debug" könyvtárba írjuk a kimenetet.
-    if debug:
-        debug = 'mailbox'
-        if config.has_key('debug'): debug = config['debug']
-        # üres fájl létrehozása
-        open('mailbox', 'w').close()
+    # Ha a config fájlban nincs csatolmány megadva
+    if 'attach' not in config:
+        config['attach'] = None
 
+    # Vesszük sorra a címeket
     for entry in forras_reader:
+        if entry[0][0] == '#': continue
         data = dict(zip(fejlec, entry))
-        # Ha van 'plugEntry' függvény, azt végrehajtjuk
+        # Ha van 'plugEntry' függvény, azt végrehajtjuk - ezt minden címnél meg kell csinálni
         if 'plugEntry' in locals():
             plugEntry(data)
 
@@ -177,7 +166,7 @@ def main():
 
 def confGen():
     if os.path.isfile(confFile):
-        print 'már van %s' % confFile
+        print('már van %s' % confFile)
         return 0
     else:
         open(confFile, 'w').write('''# YAML
@@ -208,19 +197,13 @@ header:
 #plugin: plugin.py
 
 #############################################################################
-# Ha van pdf, azt csatolja a levélhez
+# ezeket a fájlokat csatolja a levélhez
 
 #attach:
 #- csatolmany.pdf
 #- egy masik.zip
-
-#############################################################################
-# Ha teszteléshez küldés helyett egy mailbox fájlt szeretnénk létrehozni.
-# parancssorban: -d
-
-#debug: mailbox
 ''')
-        print "%s létrehozva" % confFile
+        print("%s létrehozva" % confFile)
 
 if __name__ == '__main__':
     main()
