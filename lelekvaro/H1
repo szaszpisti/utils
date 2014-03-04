@@ -16,6 +16,10 @@
 | <a class="menu" href="index.html">Lélekváró elmélkedések</a> ]
 </p>
 
+<!--
+<h1 class="cim">Lélekváró elmélkedések - %(ev)s</h1>
+-->
+
 <style type="text/css">
   p.alairas { text-align: right; }
   #lead { font-size: 70%%; padding-top: 1em; text-align: right; }
