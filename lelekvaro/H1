@@ -39,6 +39,8 @@
   @media print {
     .noprint { visibility: hidden; display: none; }
   }
+  div.vers { display: inline-block; }
+  div.vers p.alairas { margin-right: -3em; }
 </style>
 
 <div id="felso" class="noprint">
