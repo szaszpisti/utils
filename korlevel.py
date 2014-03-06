@@ -114,7 +114,8 @@ def main():
             open(debug, 'w').close()
 
     if not os.path.isfile(confFile):
-        Exit('Nincs %s fájl!\nÍgy készíthetsz: %s -g' % (confFile, prog))
+        confGen()
+        Exit('Létrehoztam, nézd át!')
 
     config = yaml.load(open('korlevel.ini'))
 
