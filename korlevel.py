@@ -9,22 +9,15 @@ ln -s ~/git/utils/korlevel.py ~/bin/korlevel
 
 import os, sys
 import csv, getopt, smtplib, yaml
-import email.header, email.utils, email.mime.text
-
-import smtplib
-
 import mimetypes
-from email import encoders
-from email.message import Message
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email import charset
+
+from email import charset, encoders
+
+from email.mime import base, text, audio, image, multipart
+from email.utils import formataddr, parseaddr
 
 # specify quoted-printable instead of base64
-charset.CHARSETS['utf-8'] = ( charset.QP, charset.QP, 'utf-8' )
+charset.CHARSETS['utf-8'] = (charset.QP, charset.QP, 'utf-8')
 
 confFile = 'korlevel.ini'
 prog = sys.argv[0]
@@ -54,13 +47,13 @@ def attach(filename):
     attachContent = open(filename, 'rb').read()
 
     if maintype == 'text':
-        msg = MIMEText(attachContent, _subtype=subtype)
+        msg = text.MIMEText(attachContent, _subtype=subtype)
     elif maintype == 'image':
-        msg = MIMEImage(attachContent, _subtype=subtype)
+        msg = image.MIMEImage(attachContent, _subtype=subtype)
     elif maintype == 'audio':
-        msg = MIMEAudio(attachContent, _subtype=subtype)
+        msg = audio.MIMEAudio(attachContent, _subtype=subtype)
     else:
-        msg = MIMEBase(maintype, subtype)
+        msg = base.MIMEBase(maintype, subtype)
         msg.set_payload(attachContent)
         encoders.encode_base64(msg)
 
@@ -82,13 +75,13 @@ def send(debug, header, To, Content, filenames=None):
     To = intlAddress(To)
 
     if filenames:
-        msg = MIMEMultipart()
+        msg = multipart.MIMEMultipart()
         # a header mezőit átmásoljuk az üzenetbe
         for field in header:
             msg[field] = header[field]
         msg['To'] = To
 
-        body = MIMEText(Content, 'plain', 'utf-8')
+        body = text.MIMEText(Content, 'plain', 'utf-8')
         msg.attach(body)
 
         for filename in filenames:
@@ -96,13 +89,12 @@ def send(debug, header, To, Content, filenames=None):
 
     # Csatolás nélküli szimpla email
     else:
-        msg = MIMEText(Content, 'plain', 'utf-8')
+        msg = text.MIMEText(Content, 'plain', 'utf-8')
         for field in header:
             msg[field] = header[field]
         msg['To'] = To
-#        msg['From'], msg['To'], msg['Subject'] = header['From'], To, Subject
 
-    # Ha csak debug kell, akkor elmentjük a "debug" fáltozóba
+    # Ha csak debug kell, akkor elmentjük a "debug" változóba
     if debug:
         open(debug, 'a').write('From pistike Mon Jan 01 00:00:00 2000\n' + msg.as_string() + '\n')
     # egyébként elküldjük
