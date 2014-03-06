@@ -60,19 +60,10 @@ def attach(filename):
     msg.add_header('Content-Disposition', 'attachment', filename=filename)
     return msg
 
-def intlAddress(address):
-    # RFC 2822 fejléc-mező ("Subject: =?iso-8859-1?q?p=F6stal?=")
-    u = lambda text: email.header.Header(text.decode('utf-8')).encode()
-
-    # Az utf-8 email cimből levélben küldhető mezőt állítunk elő
-    emil = email.utils.parseaddr(address)
-
-    return '%s <%s>' % (u(emil[0]), emil[1])
-
 def send(debug, header, To, Content, filenames=None):
 
-    header['From'] = intlAddress(header['From'])
-    To = intlAddress(To)
+    header['From'] = formataddr(parseaddr(header['From']))
+    To = formataddr(parseaddr(To))
 
     if filenames:
         msg = multipart.MIMEMultipart()
