@@ -76,6 +76,9 @@ for dir in DIR:
             honap = mm
             if yy == '03':
                 honap = '%02d' % (int(mm) + 1) # 2003-ban az első szám februárban jelent meg
+            elif yy == '13':
+                if honap > '05':
+                    honap = '%02d' % (int(mm) + 1) # 2013-ban nem volt júniusi szám
             mmStr += [YY + '. ' + HO[honap]]   # 03-04 -> ['2011. március', '2011. április']
             lapSzam += [str(int(mm))]          # 03-04 => ['3', '4']
         lapSzam = '-'.join(lapSzam) + '. szám' # ['3', '4'] => '3-4. szám'
