@@ -132,7 +132,9 @@ def main():
 
     # Ha van extra módosítási igény, azt az "config['plugin']" fájlba tesszük
     if 'plugin' in config:
-        exec(open(config['plugin']).read())
+        loc = locals()
+        exec(open(config['plugin']).read(), globals(), loc)
+        plugEntry = loc['plugEntry']
 
     # Ha a config fájlban nincs csatolmány megadva
     if 'attach' not in config:
