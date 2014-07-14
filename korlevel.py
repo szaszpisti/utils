@@ -146,7 +146,7 @@ def main():
         data = dict(zip(fejlec, entry))
         # Ha van 'plugEntry' függvény, azt végrehajtjuk - ezt minden címnél meg kell csinálni
         if 'plugEntry' in locals():
-            plugEntry(data)
+            plugEntry(config, data)
 
         send(debug, config['header'], data['email'], sablon % data, config['attach'])
 
