@@ -142,7 +142,7 @@ def main():
 
     # Vesszük sorra a címeket
     for entry in forras_reader:
-        if entry[0][0] == '#': continue
+        if not entry or entry[0][0] == '#': continue
         data = dict(zip(fejlec, entry))
         # Ha van 'plugEntry' függvény, azt végrehajtjuk - ezt minden címnél meg kell csinálni
         if 'plugEntry' in locals():
