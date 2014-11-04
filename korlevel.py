@@ -124,31 +124,31 @@ def main():
     except IOError:
         Exit('A megadott sablon fájl (%s) nem létezik.' % config['sablon'])
 
-    try:
-        forras_reader = csv.reader(open(config['forras']), delimiter=';', quoting=csv.QUOTE_MINIMAL)
-    except IOError:
-        Exit('A megadott adat fájl (%s) nem létezik.' % config['forras'])
-    fejlec = next(forras_reader)
+    with open(config['forras']) as csvfile:
+        dialect = csv.Sniffer().sniff(csvfile.read(1024), delimiters=";,")
+        csvfile.seek(0)
+        forras_reader = csv.reader(csvfile, dialect)
+        fejlec = next(forras_reader)
 
-    # Ha van extra módosítási igény, azt az "config['plugin']" fájlba tesszük
-    if 'plugin' in config:
-        loc = locals()
-        exec(open(config['plugin']).read(), globals(), loc)
-        plugEntry = loc['plugEntry']
+        # Ha van extra módosítási igény, azt az "config['plugin']" fájlba tesszük
+        if 'plugin' in config:
+            loc = locals()
+            exec(open(config['plugin']).read(), globals(), loc)
+            plugEntry = loc['plugEntry']
 
-    # Ha a config fájlban nincs csatolmány megadva
-    if 'attach' not in config:
-        config['attach'] = None
+        # Ha a config fájlban nincs csatolmány megadva
+        if 'attach' not in config:
+            config['attach'] = None
 
-    # Vesszük sorra a címeket
-    for entry in forras_reader:
-        if not entry or entry[0][0] == '#': continue
-        data = dict(zip(fejlec, entry))
-        # Ha van 'plugEntry' függvény, azt végrehajtjuk - ezt minden címnél meg kell csinálni
-        if 'plugEntry' in locals():
-            plugEntry(config, data)
+        # Vesszük sorra a címeket
+        for entry in forras_reader:
+            if not entry or entry[0][0] == '#': continue
+            data = dict(zip(fejlec, entry))
+            # Ha van 'plugEntry' függvény, azt végrehajtjuk - ezt minden címnél meg kell csinálni
+            if 'plugEntry' in locals():
+                plugEntry(config, data)
 
-        send(debug, config['header'], data['email'], sablon % data, config['attach'])
+            send(debug, config['header'], data['email'], sablon % data, config['attach'])
 
 def confGen():
     if os.path.isfile(confFile):
