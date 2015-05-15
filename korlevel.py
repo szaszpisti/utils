@@ -177,8 +177,8 @@ forras: adatok.csv
 # A küldött levél feladója és tárgya
 
 header:
- From: Karácsonyi Mikulás <mikulas@lappfold.hu>
- Subject: Ajándék értesítő
+  From: Dugonics András Piarista Gimnázium <titkarsag@szepi.hu>
+  Subject: 
 
 #############################################################################
 # Ha egyéb parancsot akarunk futtatni
