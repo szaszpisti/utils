@@ -147,8 +147,11 @@ def main():
 
         # Vesszük sorra a címeket
         for entry in forras_reader:
-            if not entry or entry[0][0] == '#': continue
             data = dict(zip(fejlec, entry))
+
+            # Nem foglalkozunk vele, ha üres sor, ha nincs email vagy megjegyzés
+            if not entry or not data['email'] or entry[0][0] == '#': continue
+
             # Ha van 'plugEntry' függvény, azt végrehajtjuk - ezt minden címnél meg kell csinálni
             if 'plugEntry' in locals():
                 plugEntry(config, data)
