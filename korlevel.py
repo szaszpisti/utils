@@ -165,7 +165,7 @@ def confGen():
 # A küldendő levél szövege, benne a kitöltendő mezők jelölésével
 # %(mezo)s formában.
 
-sablon: sablon.txt
+sablon: level.txt
 
 #############################################################################
 # A mezők értékei, a sablon mezőin kívül legyen egy 'email' mező,
