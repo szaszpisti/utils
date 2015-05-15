@@ -125,7 +125,12 @@ def main():
         Exit('A megadott sablon fájl (%s) nem létezik.' % config['sablon'])
 
     with open(config['forras']) as csvfile:
-        dialect = csv.Sniffer().sniff(csvfile.read(1024), delimiters=";,")
+        try:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024), delimiters=";,")
+        except csv.Error:
+            # Ha csak egy mezőből áll a sor: nincs delimiter, a Sniffer nem tud detektálni
+            dialect='excel'
+            pass
         csvfile.seek(0)
         forras_reader = csv.reader(csvfile, dialect)
         fejlec = next(forras_reader)
