@@ -6,9 +6,12 @@
 
 [20xx]
 - szokásosan elmenteni .hun-ban, átnevezni .txt-re (ezt használja a lelekvaro.py)
+- a vasárnapoknál mindenhol legyen odaírva, hogy "vasárnap",
+- az aláírásokat kézzel kell átírni (^P_alairas:) - és egyéb formázásokat
+      :%s/\(^`.*\)\n\n*\(\*\)/P_alairas: \1^M^M^M\2/
+- a napneveknél sehol ne legyen tabulátor,
 - ../lelekvaro.py
 - átnézzük, hogy a címek rendben vannak-e (mind megvan?) ./lelekvaro.py; grep H3 *.hun | less
-- az aláírásokat kézzel kell átírni (^P_alairas:) - és egyéb formázásokat
 - H1, H2 aktualizálása (évszám, egyéb)
 	(itt van a stílus is, hogy a www.szepi.hu-ra ne kelljen barkácsolni)
 => lelekvaro.py:
