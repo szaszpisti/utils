@@ -126,7 +126,8 @@ def main():
 
     with open(config['forras']) as csvfile:
         try:
-            dialect = csv.Sniffer().sniff(csvfile.read(1024), delimiters=";,")
+            # kitaláljuk, hogy a csv pontosvesszővel, vesszővel vagy tabulátorral van tagolva
+            dialect = csv.Sniffer().sniff(csvfile.read(1024), delimiters=";,\t")
         except csv.Error:
             # Ha csak egy mezőből áll a sor: nincs delimiter, a Sniffer nem tud detektálni
             dialect='excel'
