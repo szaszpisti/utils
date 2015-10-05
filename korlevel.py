@@ -20,7 +20,6 @@ from email.utils import formataddr, parseaddr
 charset.CHARSETS['utf-8'] = (charset.QP, charset.QP, 'utf-8')
 
 confFile = 'korlevel.ini'
-prog = sys.argv[0]
 
 def Exit(msg=None, exitcode=1):
     if msg: print(msg)
@@ -28,10 +27,11 @@ def Exit(msg=None, exitcode=1):
 
 def usage(msg=None, exitcode=1):
     if msg: print(msg)
-    print('Usage: %s [-d|--debug file] [-h|--help] [-g|--gen]' % prog)
-    print('   -h|--help       ez a súgó')
-    print('   -g|--gen        az adott könyvtárba ír egy default korlevel.ini fájlt')
-    print('   -d|--debug file nem küld levelet, hanem a "file" mailboxba teszi a leveleket')
+    print('Usage: %s [-d|--debug file] [-h|--help] [-g|--gen]' % sys.argv[0])
+    print('   -h|--help         ez a súgó')
+    print('   -g|--gen          az aktuális könyvtárba létrehoz egy konfigurációs állományt')
+    print('   -c|--conf config  a default korlevel.ini helyett a conf állományt használja')
+    print('   -d|--debug file   nem küld levelet, hanem a "file" mailboxba teszi a leveleket')
     sys.exit(exitcode)
 
 def attach(filename):
@@ -95,29 +95,32 @@ def send(debug, header, To, Content, filenames=None):
         s.quit()
 
 def main():
+    global confFile
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:g", ['help', 'debug=', 'gen'])
+        opts, args = getopt.getopt(sys.argv[1:], "hc:d:g", ['help', 'conf=', 'debug=', 'gen'])
     except getopt.GetoptError as err:
         print(str(err))
         usage()
 
+    make_conf = False
     debug = False
     for opt, arg in opts:
         if opt in ('-h', '--help'):
             usage(exitcode=0)
         elif opt in ('-g', '--gen'):
-            confGen()
-            sys.exit(0)
+            make_conf = True
+        elif opt in ('-c', '--conf'):
+            confFile = arg
         elif opt in ('-d', '--debug'):
             debug = arg
             # üres fájl létrehozása
             open(debug, 'w').close()
 
-    if not os.path.isfile(confFile):
+    if make_conf or not os.path.isfile(confFile):
         confGen()
-        Exit('Létrehoztam, nézd át!')
+        Exit('Létrehoztam (%s), nézd át!' % confFile)
 
-    config = yaml.load(open('korlevel.ini'))
+    config = yaml.load(open(confFile))
 
     try:
         sablon = open(config['sablon']).read()
