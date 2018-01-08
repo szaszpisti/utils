@@ -63,6 +63,7 @@ def attach(filename):
 def send(debug, header, To, Content, filenames=None):
 
     header['From'] = formataddr(parseaddr(header['From']))
+    To_orig = To
     To = formataddr(parseaddr(To))
 
     if filenames:
@@ -91,7 +92,10 @@ def send(debug, header, To, Content, filenames=None):
     # egyébként elküldjük
     else:
         s = smtplib.SMTP('localhost')
-        s.sendmail(header['From'], [To], msg.as_string())
+        try:
+            s.sendmail(header['From'], [To], msg.as_string())
+        except:
+            print('HIBA:', To_orig)
         s.quit()
 
 def main():
